@@ -18,7 +18,11 @@ const int rs = 3, en = 2, d4 = 4, d5 = 5, d6 = 6, d7 = 9;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 RF24 radio(7, 8);  // Set up the nRF24L01+ radio (CE pin, CSN pin)
-int XRightNorm, XLeftNorm, YRightNorm, XLeftNorm;
+
+int XRightNorm, XLeftNorm, YRightNorm, YLeftNorm; //normalised joystick values between -255 and 255
+int XRightInit, XLeftInit, YRightInit, XLeftInit //Initial values of joytick for calibration/normalisation
+uint8_t joystick [4]; //array of joystick values to be sent to car
+
 
 byte rfAddresses[][6] = {"1NODE", "2NODE"}; //???from remote template .h file
 byte rfPacket[PAYLOADSIZE]; //???from remote template .h file
@@ -46,8 +50,14 @@ void setup()
 
   radio.startListening();
 
-}
+  //Stores initial values of joysticks for calibration
+  XLeftInit = analogRead(XLeft);
+  YLeftInit = analogRead(YLeft);
+  XRightInit = analogRead(XRight);
+  YRightInit = analogRead(YRight);
 
+}
+ 
 void loop()
 {  
   if (radio.available())
@@ -103,3 +113,19 @@ void loop()
     }
    
   }
+
+void JoystickRead(); //normalises joystick to 0 and between -255 and 255
+{
+  //read the values of the joysticks
+  XLeftInit = analogRead(XLeft);
+  YLeftInit = analogRead(YLeft);
+  XRightInit = analogRead(XRight);
+  YRightInit = analogRead(XLeft);
+  
+  //normalise joystick values between -255 and 255 and to centre on 0
+  XLeftNorm = map(XLeftInit, 0, 1024, -255, 255);
+  YLeftNorm = map(YLeftInit, 0, 1024, -255, 255);
+  XRightNorm = map(XRightInit, 0, 1024, -255, 255);
+  YRightNorm = map(YRightInit, 0, 1024, -255, 255);
+  
+}
