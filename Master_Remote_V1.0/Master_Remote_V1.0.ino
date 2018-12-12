@@ -18,7 +18,8 @@ const int rs = 3, en = 2, d4 = 4, d5 = 5, d6 = 6, d7 = 9;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 RF24 radio(7, 8);  // Set up the nRF24L01+ radio (CE pin, CSN pin)
-int XRightNorm, XLeftNorm, YRightNorm, XLeftNorm;
+int XRightNorm, XLeftNorm, YRightNorm, YLeftNorm;
+uint8_t joystick[4];
 
 byte rfAddresses[][6] = {"1NODE", "2NODE"}; //???from remote template .h file
 byte rfPacket[PAYLOADSIZE]; //???from remote template .h file
@@ -70,36 +71,12 @@ void loop()
   void rout()
   {
     bool role = 1;
-    if (role ==1);
+    if (role ==1)
+    {
      radio.stopListening();                                    //stop listening so we can talk.
-    
-    Serial.println(F("Now sending"));
-
-    unsigned long start_time = micros();                             // Take the time, and send it.  This will block until complete
-     if (!radio.write( &start_time, sizeof(unsigned long) )){
-       Serial.println(F("failed"));
-     }
-      radio.startListening();                                    // Now, continue listening
-    
-    unsigned long started_waiting_at = micros();               // Set up a timeout period, get the current microseconds
-    boolean timeout = false;                                   // Set up a variable to indicate if a response was received or not
-    
-    while ( ! radio.available() ){                             // While nothing is received
-      if (micros() - started_waiting_at > 200000 ){            // If waited longer than 200ms, indicate timeout and exit while loop
-          timeout = true;
-          break;
-      }
-    }
-     radio.startListening();                                    // Now, continue listening
-    
-    unsigned long started_waiting_at = micros();               // Set up a timeout period, get the current microseconds
-    boolean timeout = false;                                   // Set up a variable to indicate if a response was received or not
-    
-    while ( ! radio.available() ){                             // While nothing is received
-      if (micros() - started_waiting_at > 200000 ){            // If waited longer than 200ms, indicate timeout and exit while loop
-          timeout = true;
-          break;
-      }
-    }
+    Serial.println(F("Now sending"));                        
+    radio.write(&joystick, sizeof(joysitck));               //sending joystick array
+    Serial.println("command sent");
    
+    }
   }
